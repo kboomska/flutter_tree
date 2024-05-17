@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 /// Класс для узла небинарного Дерева.
-class TreeNode<T> {
+abstract base class TreeNode<T> {
   /// Значение узла Дерева.
   T value;
 
@@ -12,7 +12,15 @@ class TreeNode<T> {
   List<TreeNode<T>> children;
 
   /// Класс для узла небинарного Дерева.
-  TreeNode(this.value, {this.parent}) : children = [];
+  TreeNode(this.value, {this.parent}) : children = [] {
+    parent?.addChild(this);
+  }
+
+  /// Проверка на корневой узел.
+  bool get isRoot => parent == null;
+
+  /// Уровень вложенности узла в Дереве.
+  int get level => isRoot ? 0 : parent!.level + 1;
 
   /// Добавление дочернего узла Дерева.
   void addChild(TreeNode<T> child) {
@@ -39,10 +47,10 @@ class TreeNode<T> {
   /// Печать Дерева относительно данного узла.
   ///
   /// Параметр level отвечает за отступы отражающие уровень вложенности узлов.
-  void printTree([int level = 0]) {
-    print('${' ' * level}$value');
+  void printTree() {
+    print('${'  ' * level}$value');
     for (TreeNode<T> child in children) {
-      child.printTree(level + 2);
+      child.printTree();
     }
   }
 
@@ -65,6 +73,7 @@ class TreeNode<T> {
     if (identical(this, other)) return true;
 
     return other is TreeNode<T> &&
+        other.runtimeType == runtimeType &&
         other.value == value &&
         other.parent == parent &&
         listEquals(other.children, children);

@@ -67,6 +67,7 @@ class WizardEventModel {
     if (identical(this, other)) return true;
 
     return other is WizardEventModel &&
+        other.runtimeType == runtimeType &&
         other.id == id &&
         other.formId == formId &&
         other.title == title &&
