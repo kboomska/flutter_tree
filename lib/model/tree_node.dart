@@ -13,7 +13,7 @@ abstract base class TreeNode<T> {
 
   /// Класс для узла небинарного Дерева.
   TreeNode(this.value, {this.parent}) : children = [] {
-    parent?.addChild(this);
+    parent?._addChild(this);
   }
 
   /// Проверка на корневой узел.
@@ -23,7 +23,7 @@ abstract base class TreeNode<T> {
   int get level => isRoot ? 0 : parent!.level + 1;
 
   /// Добавление дочернего узла Дерева.
-  void addChild(TreeNode<T> child) {
+  void _addChild(TreeNode<T> child) {
     child.parent = this;
     children.add(child);
   }

@@ -26,8 +26,8 @@ class WizardEventModel {
     required this.tolerance,
   });
 
-  WizardEventModel.blank()
-      : title = 'Новое Событие',
+  WizardEventModel.blank([String? title])
+      : title = title ?? 'Новое Событие',
         duration = 0,
         tolerance = 0;
 

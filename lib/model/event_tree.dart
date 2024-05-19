@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:tree/model/event_model.dart';
 import 'package:tree/model/tree_node.dart';
 
@@ -15,6 +17,20 @@ sealed class EventTree extends TreeNode<WizardEventModel> {
     required EventTree parent,
   }) =>
       NodeEventTree(value, parent: parent);
+
+  @override
+  String toString() => '$EventTree(title: ${value.title}'
+      '${children.isNotEmpty ? ', children: $children)' : ')'}';
+
+  Map<String, dynamic> toMap() {
+    return {
+      'value': value.toMap(),
+      'parent': parent?.value.toMap(),
+      'children': children.map((node) => (node as EventTree).toMap()).toList(),
+    };
+  }
+
+  String toJson() => json.encode(toMap());
 }
 
 /// Класс для корневого узла События в Дереве Событий в Визарда.
