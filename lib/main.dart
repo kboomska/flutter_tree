@@ -36,26 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final root = EventTree.root(WizardEventModel.blank('Root'));
-    final node = EventTree.node(
-      WizardEventModel.blank('Node'),
-      parent: root,
-    );
-    final node1 = EventTree.node(
-      WizardEventModel.blank('Node 1'),
-      parent: node,
-    );
-    final node2 = EventTree.node(
-      WizardEventModel.blank('Node 2'),
-      parent: root,
-    );
-    final node3 = EventTree.node(
-      WizardEventModel.blank('Node 3'),
-      parent: node2,
-    );
-
-    root.printTree();
-
-    print(root.toJson());
 
     return Scaffold(
       appBar: AppBar(
@@ -66,14 +46,16 @@ class _MyHomePageState extends State<MyHomePage> {
         child: EventTreeWidget(event: root),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          print(root.toJson());
+        },
         child: const Icon(Icons.add),
       ),
     );
   }
 }
 
-class EventTreeWidget extends StatelessWidget {
+class EventTreeWidget extends StatefulWidget {
   const EventTreeWidget({
     super.key,
     required this.event,
@@ -82,24 +64,48 @@ class EventTreeWidget extends StatelessWidget {
   final EventTree event;
 
   @override
+  State<EventTreeWidget> createState() => _EventTreeWidgetState();
+}
+
+class _EventTreeWidgetState extends State<EventTreeWidget> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: event.level * 8),
+      padding: EdgeInsets.only(left: widget.event.level * 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.lightBlue[50],
-            ),
-            child: Text(event.value.title),
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.lightBlue[50],
+                ),
+                child: Text(widget.event.value.title),
+              ),
+              IconButton(
+                onPressed: () {
+                  widget.event.addChild(
+                    EventTree(
+                      WizardEventModel.blank(
+                        'Node_${widget.event.level}${widget.event.children.length}',
+                      ),
+                    ),
+                  );
+                  setState(() {});
+                },
+                icon: const Icon(Icons.add),
+              )
+            ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: const ScrollPhysics(),
-            itemCount: event.children.length,
+            itemCount: widget.event.children.length,
             itemBuilder: (context, index) {
-              return EventTreeWidget(event: event.children[index] as EventTree);
+              return EventTreeWidget(
+                event: widget.event.children[index] as EventTree,
+              );
             },
           ),
         ],
