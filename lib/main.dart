@@ -18,15 +18,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Tree Example'),
+      home: MyHomePage(title: 'Flutter Tree Example'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
 
   final String title;
+
+  final hiddenRoot = EventTree.root(WizardEventModel.blank('Root'));
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -35,21 +37,38 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    final root = EventTree.root(WizardEventModel.blank('Root'));
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
-        child: EventTreeWidget(event: root),
+        child: EventTreeWidget(event: widget.hiddenRoot),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print(root.toJson());
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              widget.hiddenRoot.addChild(
+                EventTree(
+                  WizardEventModel.blank(
+                    'Root_${widget.hiddenRoot.children.length}',
+                  ),
+                ),
+              );
+              setState(() {});
+            },
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(width: 16, height: 16),
+          FloatingActionButton(
+            onPressed: () {
+              print(widget.hiddenRoot.toJson());
+            },
+            child: const Icon(Icons.print),
+          ),
+        ],
       ),
     );
   }
@@ -75,29 +94,30 @@ class _EventTreeWidgetState extends State<EventTreeWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.lightBlue[50],
+          if (widget.event.level > 0)
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlue[50],
+                  ),
+                  child: Text(widget.event.value.title),
                 ),
-                child: Text(widget.event.value.title),
-              ),
-              IconButton(
-                onPressed: () {
-                  widget.event.addChild(
-                    EventTree(
-                      WizardEventModel.blank(
-                        'Node_${widget.event.level}${widget.event.children.length}',
+                IconButton(
+                  onPressed: () {
+                    widget.event.addChild(
+                      EventTree(
+                        WizardEventModel.blank(
+                          'Node_${widget.event.level}${widget.event.children.length}',
+                        ),
                       ),
-                    ),
-                  );
-                  setState(() {});
-                },
-                icon: const Icon(Icons.add),
-              )
-            ],
-          ),
+                    );
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.add),
+                )
+              ],
+            ),
           ListView.builder(
             shrinkWrap: true,
             physics: const ScrollPhysics(),
